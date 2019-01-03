@@ -384,6 +384,7 @@ def build_LLVM(version_LLVM, revision, folder, tarball, debug, selfbuild, extra,
                     'cmake -G ' + '\"' + generator + '\"' + ' -DCMAKE_INSTALL_PREFIX="..\\'+ LLVM_BIN + '" ' +
                     '  -DCMAKE_BUILD_TYPE=Release' +
                     get_llvm_enable_dump_switch(version_LLVM) +
+                    '  -Thost=x64' +
                     '  -DLLVM_ENABLE_ASSERTIONS=ON' +
                     '  -DLLVM_INSTALL_UTILS=ON' +
                     '  -DLLVM_TARGETS_TO_BUILD=X86' +
