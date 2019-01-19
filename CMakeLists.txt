@@ -35,6 +35,11 @@
 #
 cmake_minimum_required(VERSION 3.8)
 
+if (UNIX)
+    set(CMAKE_C_COMPILER "clang")
+    set(CMAKE_CXX_COMPILER "clang++")
+endif()
+
 set(PROJECT_NAME ispc)
 set(ISPC_BUILD TRUE)
 project(${PROJECT_NAME})
@@ -48,7 +53,7 @@ option(ISPC_PREPARE_PACKAGE "Generate build targets for ispc package" OFF)
 
 if (UNIX)
     option(ISPC_STATIC_STDCXX_LINK "Link statically with libstdc++ and libgcc" OFF)
-    if (ISPC_PREPARE_PACKAGE)
+    if (ISPC_PREPARE_PACKAGE AND (NOT APPLE))
         option(ISPC_STATIC_LINK "Link statically" ON)
     else()
         option(ISPC_STATIC_LINK "Link statically" OFF)
@@ -81,7 +86,7 @@ find_package(PythonInterp 2.7 REQUIRED)
 
 find_package(BISON 2.4 REQUIRED)
     if (BISON_FOUND)
-        set(BISON_INPUT ${CMAKE_CURRENT_SOURCE_DIR}/parse.yy)
+        set(BISON_INPUT ${CMAKE_CURRENT_SOURCE_DIR}/src/parse.yy)
         set(BISON_CPP_OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/parse.cc)
         set(BISON_OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/parse.hh
                          ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/parse.output)
@@ -99,7 +104,7 @@ find_package(BISON 2.4 REQUIRED)
 
 find_package(FLEX 2.5 REQUIRED)
     if (FLEX_FOUND)
-        set(FLEX_INPUT  ${CMAKE_CURRENT_SOURCE_DIR}/lex.ll)
+        set(FLEX_INPUT  ${CMAKE_CURRENT_SOURCE_DIR}/src/lex.ll)
         set(FLEX_OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/lex.cpp)
         if (WIN32)
             win_path_to_cygwin(${FLEX_INPUT} ${FLEX_EXECUTABLE} FLEX_INPUT)
@@ -177,10 +182,13 @@ target_sources(${PROJECT_NAME}
         "src/type.h"
         "src/util.cpp"
         "src/util.h"
+        "src/parse.yy"
+        "src/lex.ll"
 )
 # To show stdlib.ispc in VS solution:
 if (WIN32)
     set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/stdlib.ispc" PROPERTIES HEADER_FILE_ONLY TRUE)
+    source_group("ISPC" FILES "${CMAKE_CURRENT_SOURCE_DIR}/stdlib.ispc")
 endif()
 
 # Build definitions
@@ -326,7 +334,7 @@ if (ISPC_PREPARE_PACKAGE)
     set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.txt")
     # Get ispc version
     file(READ "${CMAKE_CURRENT_SOURCE_DIR}/src/ispc_version.h" ispc_ver)
-    string(REGEX MATCH "ISPC_VERSION \"([0-9]*)\.([0-9]*)\.([0-9]*)" _ ${ispc_ver})
+    string(REGEX MATCH "ISPC_VERSION \"([0-9]*)\.([0-9]*)\.([0-9]*[a-z]*)" _ ${ispc_ver})
     set(CPACK_PACKAGE_VERSION_MAJOR ${CMAKE_MATCH_1})
     set(CPACK_PACKAGE_VERSION_MINOR ${CMAKE_MATCH_2})
     set(CPACK_PACKAGE_VERSION_PATCH ${CMAKE_MATCH_3})

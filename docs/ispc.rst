@@ -55,6 +55,7 @@ Contents:
   + `Updating ISPC Programs For Changes In ISPC 1.9.0`_
   + `Updating ISPC Programs For Changes In ISPC 1.9.1`_
   + `Updating ISPC Programs For Changes In ISPC 1.9.2`_
+  + `Updating ISPC Programs For Changes In ISPC 1.10.0`_
 
 * `Getting Started with ISPC`_
 
@@ -164,6 +165,7 @@ Contents:
 
     * `Setting and Copying Values In Memory`_
     * `Packed Load and Store Operations`_
+    * `Streaming Load and Store Operations`_
 
   + `Data Conversions`_
 
@@ -359,6 +361,17 @@ Updating ISPC Programs For Changes In ISPC 1.9.2
 
 The release doesn't contain language changes, which may affect compatibility with
 older versions.
+
+Updating ISPC Programs For Changes In ISPC 1.10.0
+-------------------------------------------------
+
+The release has several new language features, which do not affect compatibility.
+Namely, new streaming stores, aos_to_soa/soa_to_aos instrinsics for 64 bit types,
+and a "#pragma ignore".
+
+One change that potentially may affect compatibility - changed size of short vector
+types. If you use short vector types for data passed between C/C++ and ISPC, you
+may want to pay attention to it.
 
 
 Getting Started with ISPC
@@ -4285,6 +4298,78 @@ of four negative values, and initializes the first four elements of
 ``indices[]`` to the values ``{ 1, 3, 4, 5 }`` corresponding to the array
 indices where ``a[i]`` was less than zero.
 
+Streaming Load and Store Operations
+-----------------------------------
+
+The standard library offers routines for streaming load and streaming store
+operations. The implementation serves as both a streaming as well as a non-temporal
+operation. There are separate routines to be used depending on whether loading from and storing to a
+uniform variable or a varying variable.
+
+The different available variants of streaming store are given below.
+
+For storing to array from varying variable:
+
+::
+
+    void streaming_store(uniform unsigned int8 a[], unsigned int8 vals)
+    void streaming_store(uniform int8 a[], int8 vals)
+    void streaming_store(uniform unsigned int16 a[], unsigned int16 vals)
+    void streaming_store(uniform int16 a[], int16 vals)
+    void streaming_store(uniform unsigned int a[], unsigned int vals)
+    void streaming_store(uniform int a[], int vals)
+    void streaming_store(uniform unsigned int64 a[], unsigned int64 vals)
+    void streaming_store(uniform int64 a[], int64 vals)
+    void streaming_store(uniform float a[], float vals)
+    void streaming_store(uniform double a[], double vals)
+
+For storing to array from uniform variable:
+
+::
+
+    void streaming_store(uniform unsigned int8 a[], uniform unsigned int8 vals)
+    void streaming_store(uniform int8 a[], uniform int8 vals)
+    void streaming_store(uniform unsigned int16 a[], uniform unsigned int16 vals)
+    void streaming_store(uniform int16 a[], uniform int16 vals)
+    void streaming_store(uniform unsigned int a[], uniform unsigned int vals)
+    void streaming_store(uniform int a[], uniform int vals)
+    void streaming_store(uniform unsigned int64 a[], uniform unsigned int64 vals)
+    void streaming_store(uniform int64 a[], uniform int64 vals)
+    void streaming_store(uniform float a[], uniform float vals)
+    void streaming_store(uniform double a[], uniform double vals)
+
+The different available variants of streaming load are given below.
+
+For loading as varying from array:
+
+::
+
+    varying unsigned int8 streaming_load(uniform unsigned int8 a[])
+    varying int8 streaming_load(uniform int8 a[])
+    varying unsigned int16 streaming_load(uniform unsigned int16 a[])
+    varying int16 streaming_load(uniform int16 a[])
+    varying unsigned int streaming_load(uniform unsigned int a[])
+    varying int streaming_load(uniform int a[])
+    varying unsigned int64 streaming_load(uniform unsigned int64 a[])
+    varying int64 streaming_load(uniform int64 a[])
+    varying float streaming_load(uniform float a[])
+    varying double streaming_load(uniform double a[])
+
+For loading as uniform from array:
+
+::
+
+    uniform unsigned int8 streaming_load_uniform(uniform unsigned int8 a[])
+    uniform int8 streaming_load_uniform(uniform int8 a[])
+    uniform unsigned int16 streaming_load_uniform(uniform unsigned int16 a[])
+    uniform int16 streaming_load_uniform(uniform int16 a[])
+    uniform unsigned int streaming_load_uniform(uniform unsigned int a[])
+    uniform int streaming_load_uniform(uniform int a[])
+    uniform unsigned int64 streaming_load_uniform(uniform unsigned int64 a[])
+    uniform int64 streaming_load_uniform(uniform int64 a[])
+    uniform float streaming_load_uniform(uniform float a[])
+    uniform double streaming_load_uniform(uniform double a[])
+
 
 Data Conversions
 ----------------
@@ -5210,7 +5295,7 @@ countries.
 
 * Other names and brands may be claimed as the property of others.
 
-Copyright(C) 2011-2018, Intel Corporation. All rights reserved.
+Copyright(C) 2011-2019, Intel Corporation. All rights reserved.
 
 
 Optimization Notice

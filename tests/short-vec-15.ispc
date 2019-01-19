@@ -7,8 +7,12 @@ export void f_fu(uniform float RET[], uniform float aFOO[], uniform float b) {
     RET[programIndex] = 0;
 
     x = (x < y) ? x : y;
-    if (programIndex < 4)
+    if (programIndex < 4) {
+        // TODO: we need to optimize ispc to not throw out-of-bound warning here.
+        #pragma ignore warning
         RET[programIndex] = x[programIndex];
+    }
+
 }
 
 export void result(uniform float RET[]) {
